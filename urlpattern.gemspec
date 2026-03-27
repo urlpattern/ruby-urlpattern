@@ -4,7 +4,7 @@ require_relative "lib/urlpattern/version"
 
 Gem::Specification.new do |spec|
   spec.name = "urlpattern"
-  spec.version = Urlpattern::VERSION
+  spec.version = URLPattern::VERSION
   spec.authors = ["방성범 (Bang Seongbeom)"]
   spec.email = ["bangseongbeom@gmail.com"]
 

@@ -6,7 +6,7 @@ pub fn hello(subject: String) -> String {
 
 #[magnus::init]
 fn init(ruby: &Ruby) -> Result<(), Error> {
-    let module = ruby.define_module("Urlpattern")?;
+    let module = ruby.define_module("URLPattern")?;
     module.define_singleton_method("hello", function!(hello, 1))?;
     Ok(())
 }

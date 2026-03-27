@@ -3,7 +3,7 @@
 require_relative "urlpattern/version"
 require "urlpattern/urlpattern"
 
-module Urlpattern
+module URLPattern
   class Error < StandardError; end
   # Your code goes here...
 end
