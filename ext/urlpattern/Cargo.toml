@@ -1,7 +1,7 @@
 [package]
 name = "urlpattern"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 authors = ["방성범 (Bang Seongbeom) <bangseongbeom@gmail.com>"]
 license = "MIT"
 publish = false
