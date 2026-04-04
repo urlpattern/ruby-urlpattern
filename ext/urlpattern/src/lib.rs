@@ -1,23 +1,312 @@
-use magnus::{function, prelude::*, Error, Ruby};
+use magnus::{
+    Error, ExceptionClass, Module, RArray, RHash, RModule, RString, Ruby, Value, function, method,
+    prelude::*, wrap,
+};
 
-pub fn hello(subject: String) -> String {
-    format!("Hello {subject}, from Rust!")
+#[wrap(class = "URLPattern::URLPattern")]
+struct UrlPattern(urlpattern::UrlPattern);
+
+impl UrlPattern {
+    fn new(ruby: &Ruby, arguments: RArray) -> Result<Self, Error> {
+        let input: Option<Value> = arguments.entry(0)?;
+        let base_url: Option<Value> = arguments.entry(1)?;
+        let options: Option<RHash> = arguments.entry(2)?;
+
+        let module: RModule = ruby.class_object().const_get("URLPattern")?;
+        let error_class: ExceptionClass = module.const_get("Error")?;
+
+        let (base_url, options) = match base_url {
+            Some(base_url) => {
+                if base_url.is_kind_of(ruby.class_string()) {
+                    (Some(base_url.to_string()), options)
+                } else {
+                    (None, options)
+                }
+            }
+            None => (None, options),
+        };
+
+        let options = match options {
+            Some(options) => urlpattern::UrlPatternOptions {
+                ignore_case: options.fetch::<_, bool>(ruby.to_symbol("ignore_case"))?,
+                ..urlpattern::UrlPatternOptions::default()
+            },
+            None => urlpattern::UrlPatternOptions::default(),
+        };
+
+        let init: urlpattern::UrlPatternInit = match input {
+            Some(input) if input.is_kind_of(ruby.class_string()) => {
+                urlpattern::UrlPatternInit::parse_constructor_string::<regex::Regex>(
+                    String::try_convert(input)?.as_str(),
+                    match base_url {
+                        Some(base_url) => {
+                            Some(base_url.parse().map_err(|e: url::ParseError| {
+                                Error::new(error_class, e.to_string())
+                            })?)
+                        }
+                        None => None,
+                    },
+                )
+                .map_err(|e| Error::new(error_class, e.to_string()))?
+            }
+            Some(input) if input.is_kind_of(ruby.class_hash()) => {
+                if base_url.is_some() {
+                    return Err(Error::new(
+                        error_class,
+                        "base_url cannot be provided when input is a Hash",
+                    ));
+                }
+
+                let input = RHash::try_convert(input)?;
+
+                urlpattern::UrlPatternInit {
+                    protocol: input.lookup(ruby.to_symbol("protocol"))?,
+                    username: input.lookup(ruby.to_symbol("username"))?,
+                    password: input.lookup(ruby.to_symbol("password"))?,
+                    hostname: input.lookup(ruby.to_symbol("hostname"))?,
+                    port: input.lookup(ruby.to_symbol("port"))?,
+                    pathname: input.lookup(ruby.to_symbol("pathname"))?,
+                    search: input.lookup(ruby.to_symbol("search"))?,
+                    hash: input.lookup(ruby.to_symbol("hash"))?,
+                    base_url: input
+                        .lookup::<_, Option<String>>(ruby.to_symbol("base_url"))?
+                        .map(|s| s.parse())
+                        .transpose()
+                        .map_err(|e: url::ParseError| Error::new(error_class, e.to_string()))?,
+                }
+            }
+            None => urlpattern::UrlPatternInit::default(),
+            Some(_) => {
+                return Err(Error::new(error_class, "invalid input type"));
+            }
+        };
+
+        Ok(Self(
+            urlpattern::UrlPattern::parse(init, options)
+                .map_err(|e| Error::new(error_class, e.to_string()))?,
+        ))
+    }
+
+    fn test(ruby: &Ruby, rb_self: &Self, arguments: RArray) -> Result<bool, Error> {
+        let input: Option<Value> = arguments.entry(0)?;
+        let base_url: Option<String> = arguments.entry(1)?;
+
+        let module: RModule = ruby.class_object().const_get("URLPattern")?;
+        let error_class: ExceptionClass = module.const_get("Error")?;
+
+        let input: urlpattern::UrlPatternMatchInput = match input {
+            Some(input) if input.is_kind_of(ruby.class_string()) => {
+                let input = String::try_convert(input)?;
+
+                match base_url {
+                    Some(base_url) => {
+                        let base_url = match url::Url::parse(&base_url) {
+                            Ok(url) => url,
+                            Err(_) => return Ok(false),
+                        };
+                        ::urlpattern::UrlPatternMatchInput::Url(
+                            match url::Url::options().base_url(Some(&base_url)).parse(&input) {
+                                Ok(url) => url,
+                                Err(_) => return Ok(false),
+                            },
+                        )
+                    }
+                    None => {
+                        ::urlpattern::UrlPatternMatchInput::Url(match url::Url::parse(&input) {
+                            Ok(url) => url,
+                            Err(e) => return Err(Error::new(error_class, e.to_string())),
+                        })
+                    }
+                }
+            }
+            Some(input) if input.is_kind_of(ruby.class_hash()) => {
+                let input = RHash::try_convert(input)?;
+
+                urlpattern::UrlPatternMatchInput::Init(urlpattern::UrlPatternInit {
+                    protocol: input.lookup(ruby.to_symbol("protocol"))?,
+                    username: input.lookup(ruby.to_symbol("username"))?,
+                    password: input.lookup(ruby.to_symbol("password"))?,
+                    hostname: input.lookup(ruby.to_symbol("hostname"))?,
+                    port: input.lookup(ruby.to_symbol("port"))?,
+                    pathname: input.lookup(ruby.to_symbol("pathname"))?,
+                    search: input.lookup(ruby.to_symbol("search"))?,
+                    hash: input.lookup(ruby.to_symbol("hash"))?,
+                    base_url: input
+                        .lookup::<_, Option<String>>(ruby.to_symbol("base_url"))?
+                        .map(|s| s.parse())
+                        .transpose()
+                        .map_err(|e: url::ParseError| Error::new(error_class, e.to_string()))?,
+                })
+            }
+            None => urlpattern::UrlPatternMatchInput::Init(urlpattern::UrlPatternInit::default()),
+            Some(_) => return Err(Error::new(error_class, "invalid input type")),
+        };
+
+        rb_self
+            .0
+            .test(input)
+            .map_err(|e| Error::new(error_class, e.to_string()))
+    }
+
+    fn exec(ruby: &Ruby, rb_self: &Self, arguments: RArray) -> Result<Option<RHash>, Error> {
+        let input: Option<Value> = arguments.entry(0)?;
+        let base_url: Option<RString> = arguments.entry(1)?;
+
+        let module: RModule = ruby.class_object().const_get("URLPattern")?;
+        let error_class: ExceptionClass = module.const_get("Error")?;
+
+        let urlpattern_input: urlpattern::UrlPatternMatchInput = match input {
+            Some(input) if input.is_kind_of(ruby.class_string()) => {
+                let input = String::try_convert(input)?;
+
+                match base_url {
+                    Some(base_url) => {
+                        let base_url = match url::Url::parse(&base_url.to_string()?) {
+                            Ok(url) => url,
+                            Err(_) => return Ok(None),
+                        };
+                        ::urlpattern::UrlPatternMatchInput::Url(
+                            match url::Url::options().base_url(Some(&base_url)).parse(&input) {
+                                Ok(url) => url,
+                                Err(_) => return Ok(None),
+                            },
+                        )
+                    }
+                    None => {
+                        ::urlpattern::UrlPatternMatchInput::Url(match url::Url::parse(&input) {
+                            Ok(url) => url,
+                            Err(e) => return Err(Error::new(error_class, e.to_string())),
+                        })
+                    }
+                }
+            }
+            Some(input) if input.is_kind_of(ruby.class_hash()) => {
+                let input = RHash::try_convert(input)?;
+
+                urlpattern::UrlPatternMatchInput::Init(urlpattern::UrlPatternInit {
+                    protocol: input.lookup(ruby.to_symbol("protocol"))?,
+                    username: input.lookup(ruby.to_symbol("username"))?,
+                    password: input.lookup(ruby.to_symbol("password"))?,
+                    hostname: input.lookup(ruby.to_symbol("hostname"))?,
+                    port: input.lookup(ruby.to_symbol("port"))?,
+                    pathname: input.lookup(ruby.to_symbol("pathname"))?,
+                    search: input.lookup(ruby.to_symbol("search"))?,
+                    hash: input.lookup(ruby.to_symbol("hash"))?,
+                    base_url: input
+                        .lookup::<_, Option<String>>(ruby.to_symbol("base_url"))?
+                        .map(|s| s.parse())
+                        .transpose()
+                        .map_err(|e: url::ParseError| Error::new(error_class, e.to_string()))?,
+                })
+            }
+            None => urlpattern::UrlPatternMatchInput::Init(urlpattern::UrlPatternInit::default()),
+            Some(_) => return Err(Error::new(error_class, "invalid input type")),
+        };
+
+        let Some(urlpattern_result) = rb_self
+            .0
+            .exec(urlpattern_input)
+            .map_err(|e| Error::new(error_class, e.to_string()))?
+        else {
+            return Ok(None);
+        };
+
+        let result = ruby.hash_new();
+
+        let inputs = ruby.ary_new();
+        if let Some(input) = input {
+            inputs.push(input)?;
+        } else {
+            inputs.push(ruby.hash_new())?;
+        }
+        if let Some(base_url) = base_url {
+            inputs.push(base_url)?;
+        }
+        result.aset(ruby.to_symbol("inputs"), inputs)?;
+
+        let protocol = ruby.hash_new();
+        protocol.aset(ruby.to_symbol("input"), urlpattern_result.protocol.input)?;
+        let groups = ruby.hash_new();
+        for (key, value) in urlpattern_result.protocol.groups {
+            groups.aset(key, value)?;
+        }
+        protocol.aset(ruby.to_symbol("groups"), groups)?;
+        result.aset(ruby.to_symbol("protocol"), protocol)?;
+
+        let username = ruby.hash_new();
+        username.aset(ruby.to_symbol("input"), urlpattern_result.username.input)?;
+        let groups = ruby.hash_new();
+        for (key, value) in urlpattern_result.username.groups {
+            groups.aset(key, value)?;
+        }
+        username.aset(ruby.to_symbol("groups"), groups)?;
+        result.aset(ruby.to_symbol("username"), username)?;
+
+        let password = ruby.hash_new();
+        password.aset(ruby.to_symbol("input"), urlpattern_result.password.input)?;
+        let groups = ruby.hash_new();
+        for (key, value) in urlpattern_result.password.groups {
+            groups.aset(key, value)?;
+        }
+        password.aset(ruby.to_symbol("groups"), groups)?;
+        result.aset(ruby.to_symbol("password"), password)?;
+
+        let hostname = ruby.hash_new();
+        hostname.aset(ruby.to_symbol("input"), urlpattern_result.hostname.input)?;
+        let groups = ruby.hash_new();
+        for (key, value) in urlpattern_result.hostname.groups {
+            groups.aset(key, value)?;
+        }
+        hostname.aset(ruby.to_symbol("groups"), groups)?;
+        result.aset(ruby.to_symbol("hostname"), hostname)?;
+
+        let port = ruby.hash_new();
+        port.aset(ruby.to_symbol("input"), urlpattern_result.port.input)?;
+        let groups = ruby.hash_new();
+        for (key, value) in urlpattern_result.port.groups {
+            groups.aset(key, value)?;
+        }
+        port.aset(ruby.to_symbol("groups"), groups)?;
+        result.aset(ruby.to_symbol("port"), port)?;
+
+        let pathname = ruby.hash_new();
+        pathname.aset(ruby.to_symbol("input"), urlpattern_result.pathname.input)?;
+        let groups = ruby.hash_new();
+        for (key, value) in urlpattern_result.pathname.groups {
+            groups.aset(key, value)?;
+        }
+        pathname.aset(ruby.to_symbol("groups"), groups)?;
+        result.aset(ruby.to_symbol("pathname"), pathname)?;
+
+        let search = ruby.hash_new();
+        search.aset(ruby.to_symbol("input"), urlpattern_result.search.input)?;
+        let groups = ruby.hash_new();
+        for (key, value) in urlpattern_result.search.groups {
+            groups.aset(key, value)?;
+        }
+        search.aset(ruby.to_symbol("groups"), groups)?;
+        result.aset(ruby.to_symbol("search"), search)?;
+
+        let hash = ruby.hash_new();
+        hash.aset(ruby.to_symbol("input"), urlpattern_result.hash.input)?;
+        let groups = ruby.hash_new();
+        for (key, value) in urlpattern_result.hash.groups {
+            groups.aset(key, value)?;
+        }
+        hash.aset(ruby.to_symbol("groups"), groups)?;
+        result.aset(ruby.to_symbol("hash"), hash)?;
+
+        Ok(Some(result))
+    }
 }
 
 #[magnus::init]
 fn init(ruby: &Ruby) -> Result<(), Error> {
     let module = ruby.define_module("URLPattern")?;
-    module.define_singleton_method("hello", function!(hello, 1))?;
+    let _error = module.define_error("Error", ruby.exception_standard_error())?;
+    let class = module.define_class("URLPattern", ruby.class_object())?;
+    class.define_singleton_method("new", function!(UrlPattern::new, -2))?;
+    class.define_method("test", method!(UrlPattern::test, -2))?;
+    class.define_method("exec", method!(UrlPattern::exec, -2))?;
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use rb_sys_test_helpers::ruby_test;
-    use super::hello;
-
-    #[ruby_test]
-    fn test_hello() {
-        assert_eq!("Hello world, from Rust!", hello("world".to_string()));
-    }
 }
