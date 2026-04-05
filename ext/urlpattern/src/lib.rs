@@ -298,6 +298,35 @@ impl UrlPattern {
 
         Ok(Some(result))
     }
+
+    fn protocol(&self) -> &str {
+        self.0.protocol()
+    }
+    fn username(&self) -> &str {
+        self.0.username()
+    }
+    fn password(&self) -> &str {
+        self.0.password()
+    }
+    fn hostname(&self) -> &str {
+        self.0.hostname()
+    }
+    fn port(&self) -> &str {
+        self.0.port()
+    }
+    fn pathname(&self) -> &str {
+        self.0.pathname()
+    }
+    fn search(&self) -> &str {
+        self.0.search()
+    }
+    fn hash(&self) -> &str {
+        self.0.hash()
+    }
+
+    fn has_regexp_groups(&self) -> bool {
+        self.0.has_regexp_groups()
+    }
 }
 
 #[magnus::init]
@@ -308,5 +337,17 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     class.define_singleton_method("new", function!(UrlPattern::new, -2))?;
     class.define_method("test", method!(UrlPattern::test, -2))?;
     class.define_method("exec", method!(UrlPattern::exec, -2))?;
+    class.define_method("protocol", method!(UrlPattern::protocol, 0))?;
+    class.define_method("username", method!(UrlPattern::username, 0))?;
+    class.define_method("password", method!(UrlPattern::password, 0))?;
+    class.define_method("hostname", method!(UrlPattern::hostname, 0))?;
+    class.define_method("port", method!(UrlPattern::port, 0))?;
+    class.define_method("pathname", method!(UrlPattern::pathname, 0))?;
+    class.define_method("search", method!(UrlPattern::search, 0))?;
+    class.define_method("hash", method!(UrlPattern::hash, 0))?;
+    class.define_method(
+        "has_regexp_groups?",
+        method!(UrlPattern::has_regexp_groups, 0),
+    )?;
     Ok(())
 }
