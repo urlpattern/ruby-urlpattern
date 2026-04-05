@@ -335,7 +335,7 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     let _error = module.define_error("Error", ruby.exception_standard_error())?;
     let class = module.define_class("URLPattern", ruby.class_object())?;
     class.define_singleton_method("new", function!(UrlPattern::new, -2))?;
-    class.define_method("test", method!(UrlPattern::test, -2))?;
+    class.define_method("test?", method!(UrlPattern::test, -2))?;
     class.define_method("exec", method!(UrlPattern::exec, -2))?;
     class.define_method("protocol", method!(UrlPattern::protocol, 0))?;
     class.define_method("username", method!(UrlPattern::username, 0))?;
