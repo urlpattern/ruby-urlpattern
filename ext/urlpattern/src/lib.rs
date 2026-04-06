@@ -1,16 +1,21 @@
 use magnus::{
-    Error, ExceptionClass, Module, RArray, RHash, RModule, RString, Ruby, Value, function, method,
-    prelude::*, wrap,
+    Error, ExceptionClass, Module, RHash, RModule, RString, Ruby, Value, function, method,
+    prelude::*, scan_args::scan_args, wrap,
 };
 
 #[wrap(class = "URLPattern::URLPattern")]
 struct UrlPattern(urlpattern::UrlPattern);
 
 impl UrlPattern {
-    fn new(ruby: &Ruby, arguments: RArray) -> Result<Self, Error> {
-        let input: Option<Value> = arguments.entry(0)?;
-        let base_url: Option<Value> = arguments.entry(1)?;
-        let options: Option<RHash> = arguments.entry(2)?;
+    fn new(ruby: &Ruby, args: &[Value]) -> Result<Self, Error> {
+        let args = scan_args(args)?;
+        let _: () = args.required;
+        let (input, base_url, options): (Option<Value>, Option<Value>, Option<RHash>) =
+            args.optional;
+        let _: () = args.splat;
+        let _: () = args.trailing;
+        let _: () = args.keywords;
+        let _: () = args.block;
 
         let module: RModule = ruby.class_object().const_get("URLPattern")?;
         let error_class: ExceptionClass = module.const_get("Error")?;
@@ -87,9 +92,14 @@ impl UrlPattern {
         ))
     }
 
-    fn test(ruby: &Ruby, rb_self: &Self, arguments: RArray) -> Result<bool, Error> {
-        let input: Option<Value> = arguments.entry(0)?;
-        let base_url: Option<String> = arguments.entry(1)?;
+    fn test(ruby: &Ruby, rb_self: &Self, args: &[Value]) -> Result<bool, Error> {
+        let args = scan_args(args)?;
+        let _: () = args.required;
+        let (input, base_url): (Option<Value>, Option<String>) = args.optional;
+        let _: () = args.splat;
+        let _: () = args.trailing;
+        let _: () = args.keywords;
+        let _: () = args.block;
 
         let module: RModule = ruby.class_object().const_get("URLPattern")?;
         let error_class: ExceptionClass = module.const_get("Error")?;
@@ -148,9 +158,14 @@ impl UrlPattern {
             .map_err(|e| Error::new(error_class, e.to_string()))
     }
 
-    fn exec(ruby: &Ruby, rb_self: &Self, arguments: RArray) -> Result<Option<RHash>, Error> {
-        let input: Option<Value> = arguments.entry(0)?;
-        let base_url: Option<RString> = arguments.entry(1)?;
+    fn exec(ruby: &Ruby, rb_self: &Self, args: &[Value]) -> Result<Option<RHash>, Error> {
+        let args = scan_args(args)?;
+        let _: () = args.required;
+        let (input, base_url): (Option<Value>, Option<RString>) = args.optional;
+        let _: () = args.splat;
+        let _: () = args.trailing;
+        let _: () = args.keywords;
+        let _: () = args.block;
 
         let module: RModule = ruby.class_object().const_get("URLPattern")?;
         let error_class: ExceptionClass = module.const_get("Error")?;
@@ -334,9 +349,9 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     let module = ruby.define_module("URLPattern")?;
     let _error = module.define_error("Error", ruby.exception_standard_error())?;
     let class = module.define_class("URLPattern", ruby.class_object())?;
-    class.define_singleton_method("new", function!(UrlPattern::new, -2))?;
-    class.define_method("test?", method!(UrlPattern::test, -2))?;
-    class.define_method("exec", method!(UrlPattern::exec, -2))?;
+    class.define_singleton_method("new", function!(UrlPattern::new, -1))?;
+    class.define_method("test?", method!(UrlPattern::test, -1))?;
+    class.define_method("exec", method!(UrlPattern::exec, -1))?;
     class.define_method("protocol", method!(UrlPattern::protocol, 0))?;
     class.define_method("username", method!(UrlPattern::username, 0))?;
     class.define_method("password", method!(UrlPattern::password, 0))?;
