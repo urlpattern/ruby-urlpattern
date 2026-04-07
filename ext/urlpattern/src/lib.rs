@@ -132,6 +132,13 @@ impl UrlPattern {
                 }
             }
             Some(input) if input.is_kind_of(ruby.class_hash()) => {
+                if base_url.is_some() {
+                    return Err(Error::new(
+                        error_class,
+                        "base_url cannot be provided when input is a Hash",
+                    ));
+                }
+
                 let input = RHash::try_convert(input)?;
 
                 urlpattern::UrlPatternMatchInput::Init(urlpattern::UrlPatternInit {
@@ -198,6 +205,13 @@ impl UrlPattern {
                 }
             }
             Some(input) if input.is_kind_of(ruby.class_hash()) => {
+                if base_url.is_some() {
+                    return Err(Error::new(
+                        error_class,
+                        "base_url cannot be provided when input is a Hash",
+                    ));
+                }
+
                 let input = RHash::try_convert(input)?;
 
                 urlpattern::UrlPatternMatchInput::Init(urlpattern::UrlPatternInit {
