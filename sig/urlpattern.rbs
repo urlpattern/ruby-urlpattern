@@ -1,4 +1,63 @@
 module URLPattern
   VERSION: String
   # See the writing guide of rbs: https://github.com/ruby/rbs#guides
+
+  class Error < StandardError
+  end
+
+  type urlpattern_input = String | urlpattern_init
+
+  class URLPattern
+    def initialize: (urlpattern_input input, String base_url, ?urlpattern_options options) -> void
+                  | (?urlpattern_input input, ?urlpattern_options options) -> void
+
+    def test?: (?urlpattern_input input, ?String base_url) -> bool
+
+    def exec: (?urlpattern_input input, ?String base_url) -> urlpattern_result?
+
+    def protocol: () -> String
+    def username: () -> String
+    def password: () -> String
+    def hostname: () -> String
+    def port: () -> String
+    def pathname: () -> String
+    def search: () -> String
+    def hash: () -> String
+    def has_regexp_groups?: () -> bool
+  end
+
+  type urlpattern_init = {
+    ?protocol: String,
+    ?username: String,
+    ?password: String,
+    ?hostname: String,
+    ?port: String,
+    ?pathname: String,
+    ?search: String,
+    ?hash: String,
+    ?base_url: String
+  }
+
+  type urlpattern_options = {
+    ?ignore_case: bool
+  }
+
+  type urlpattern_result = {
+    ?inputs: Array[urlpattern_input],
+    ?protocol: urlpattern_component_result,
+    ?username: urlpattern_component_result,
+    ?password: urlpattern_component_result,
+    ?hostname: urlpattern_component_result,
+    ?port: urlpattern_component_result,
+    ?pathname: urlpattern_component_result,
+    ?search: urlpattern_component_result,
+    ?hash: urlpattern_component_result
+  }
+
+  type urlpattern_component_result = {
+    ?input: String,
+    ?groups: Hash[String, String?]
+  }
+
+  type urlpattern_compatible = String | urlpattern_init | URLPattern
 end
