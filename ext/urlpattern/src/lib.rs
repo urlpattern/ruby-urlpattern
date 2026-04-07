@@ -42,7 +42,7 @@ impl UrlPattern {
 
         let options = match options {
             Some(options) => urlpattern::UrlPatternOptions {
-                ignore_case: options.fetch::<_, bool>(ruby.to_symbol("ignore_case"))?,
+                ignore_case: options.lookup2(ruby.to_symbol("ignore_case"), false)?,
                 ..urlpattern::UrlPatternOptions::default()
             },
             None => urlpattern::UrlPatternOptions::default(),
