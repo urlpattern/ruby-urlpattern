@@ -22,13 +22,22 @@ impl UrlPattern {
 
         let (base_url, options) = match base_url {
             Some(base_url) => {
-                if base_url.is_kind_of(ruby.class_string()) {
-                    (Some(base_url.to_string()), options)
+                if base_url.is_kind_of(ruby.class_hash()) {
+                    (None, Some(RHash::try_convert(base_url)?))
                 } else {
-                    (None, options)
+                    (Some(base_url), options)
                 }
             }
             None => (None, options),
+        };
+
+        let base_url = match base_url {
+            Some(base_url) => Some(
+                String::try_convert(base_url)?
+                    .parse()
+                    .map_err(|e: url::ParseError| Error::new(error_class, e.to_string()))?,
+            ),
+            None => None,
         };
 
         let options = match options {
@@ -43,14 +52,7 @@ impl UrlPattern {
             Some(input) if input.is_kind_of(ruby.class_string()) => {
                 urlpattern::UrlPatternInit::parse_constructor_string::<regex::Regex>(
                     String::try_convert(input)?.as_str(),
-                    match base_url {
-                        Some(base_url) => {
-                            Some(base_url.parse().map_err(|e: url::ParseError| {
-                                Error::new(error_class, e.to_string())
-                            })?)
-                        }
-                        None => None,
-                    },
+                    base_url,
                 )
                 .map_err(|e| Error::new(error_class, e.to_string()))?
             }
