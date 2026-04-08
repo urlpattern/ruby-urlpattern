@@ -56,7 +56,7 @@ module URLPattern
 
   type urlpattern_component_result = {
     ?input: String,
-    ?groups: Hash[String, String?]
+    ?groups: Hash[Symbol, String?]
   }
 
   type urlpattern_compatible = String | urlpattern_init | URLPattern

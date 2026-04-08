@@ -259,7 +259,7 @@ impl UrlPattern {
         protocol.aset(ruby.to_symbol("input"), urlpattern_result.protocol.input)?;
         let groups = ruby.hash_new();
         for (key, value) in urlpattern_result.protocol.groups {
-            groups.aset(key, value)?;
+            groups.aset(ruby.to_symbol(key), value)?;
         }
         protocol.aset(ruby.to_symbol("groups"), groups)?;
         result.aset(ruby.to_symbol("protocol"), protocol)?;
@@ -268,7 +268,7 @@ impl UrlPattern {
         username.aset(ruby.to_symbol("input"), urlpattern_result.username.input)?;
         let groups = ruby.hash_new();
         for (key, value) in urlpattern_result.username.groups {
-            groups.aset(key, value)?;
+            groups.aset(ruby.to_symbol(key), value)?;
         }
         username.aset(ruby.to_symbol("groups"), groups)?;
         result.aset(ruby.to_symbol("username"), username)?;
@@ -277,7 +277,7 @@ impl UrlPattern {
         password.aset(ruby.to_symbol("input"), urlpattern_result.password.input)?;
         let groups = ruby.hash_new();
         for (key, value) in urlpattern_result.password.groups {
-            groups.aset(key, value)?;
+            groups.aset(ruby.to_symbol(key), value)?;
         }
         password.aset(ruby.to_symbol("groups"), groups)?;
         result.aset(ruby.to_symbol("password"), password)?;
@@ -286,7 +286,7 @@ impl UrlPattern {
         hostname.aset(ruby.to_symbol("input"), urlpattern_result.hostname.input)?;
         let groups = ruby.hash_new();
         for (key, value) in urlpattern_result.hostname.groups {
-            groups.aset(key, value)?;
+            groups.aset(ruby.to_symbol(key), value)?;
         }
         hostname.aset(ruby.to_symbol("groups"), groups)?;
         result.aset(ruby.to_symbol("hostname"), hostname)?;
@@ -295,7 +295,7 @@ impl UrlPattern {
         port.aset(ruby.to_symbol("input"), urlpattern_result.port.input)?;
         let groups = ruby.hash_new();
         for (key, value) in urlpattern_result.port.groups {
-            groups.aset(key, value)?;
+            groups.aset(ruby.to_symbol(key), value)?;
         }
         port.aset(ruby.to_symbol("groups"), groups)?;
         result.aset(ruby.to_symbol("port"), port)?;
@@ -304,7 +304,7 @@ impl UrlPattern {
         pathname.aset(ruby.to_symbol("input"), urlpattern_result.pathname.input)?;
         let groups = ruby.hash_new();
         for (key, value) in urlpattern_result.pathname.groups {
-            groups.aset(key, value)?;
+            groups.aset(ruby.to_symbol(key), value)?;
         }
         pathname.aset(ruby.to_symbol("groups"), groups)?;
         result.aset(ruby.to_symbol("pathname"), pathname)?;
@@ -313,7 +313,7 @@ impl UrlPattern {
         search.aset(ruby.to_symbol("input"), urlpattern_result.search.input)?;
         let groups = ruby.hash_new();
         for (key, value) in urlpattern_result.search.groups {
-            groups.aset(key, value)?;
+            groups.aset(ruby.to_symbol(key), value)?;
         }
         search.aset(ruby.to_symbol("groups"), groups)?;
         result.aset(ruby.to_symbol("search"), search)?;
@@ -322,7 +322,7 @@ impl UrlPattern {
         hash.aset(ruby.to_symbol("input"), urlpattern_result.hash.input)?;
         let groups = ruby.hash_new();
         for (key, value) in urlpattern_result.hash.groups {
-            groups.aset(key, value)?;
+            groups.aset(ruby.to_symbol(key), value)?;
         }
         hash.aset(ruby.to_symbol("groups"), groups)?;
         result.aset(ruby.to_symbol("hash"), hash)?;
