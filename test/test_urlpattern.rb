@@ -39,51 +39,85 @@ class TestURLPattern < Minitest::Test
 
   URLPATTERNTESTDATA.each_with_index do |entry, i|
     define_method("test_urlpattern_#{i}") do
-      skip if [[{ pathname: "*{}**?" }], ["((?R)):"]].include?(entry[:pattern])
+      skip_if_unsupported entry
 
-      if entry[:expected_obj] == "error"
-        assert_raises(StandardError) { URLPattern::URLPattern.new(*entry[:pattern]) }
-        return
-      end
+      return if assert_expected_obj_error entry
 
-      begin
-        pattern = URLPattern::URLPattern.new(*entry[:pattern])
-      rescue EncodingError
-        skip
-      end
+      pattern = new_urlpattern entry
 
-      entry[:expected_obj]&.each do |key, value|
-        assert_equal pattern.send(key), value
-      end
+      assert_expected_obj pattern, entry
 
-      if entry[:expected_match] == "error"
-        assert_raises(StandardError) { pattern.test?(*entry[:inputs]) }
+      return if assert_expected_match pattern, entry
 
-        assert_raises(StandardError) { pattern.exec(*entry[:inputs]) }
+      assert_exactly_empty_components pattern, entry
+    end
+  end
 
-        return
+  private
 
-      elsif entry[:expected_match].is_a?(Hash)
-        assert pattern.test?(*entry[:inputs])
+  def skip_if_unsupported(entry)
+    skip if [[{ pathname: "*{}**?" }], ["((?R)):"]].include?(entry[:pattern])
+  end
 
-        result = pattern.exec(*entry[:inputs])
-        refute_nil result
-        entry[:expected_match].each do |key, expected|
-          assert_equal result[key], expected
-        end
+  def assert_expected_obj_error(entry)
+    return unless entry[:expected_obj] == "error"
 
-      else
-        refute pattern.test?(*entry[:inputs])
+    assert_raises(StandardError) { URLPattern::URLPattern.new(*entry[:pattern]) }
+    true
+  end
 
-        assert_nil pattern.exec(*entry[:inputs])
-      end
+  def new_urlpattern(entry)
+    URLPattern::URLPattern.new(*entry[:pattern])
+  rescue EncodingError
+    skip
+  end
 
-      return unless entry.key?(:exactly_empty_components)
+  def assert_expected_obj(pattern, entry)
+    entry[:expected_obj]&.each do |key, value|
+      assert_equal pattern.send(key), value
+    end
+  end
 
-      result = pattern.exec(*entry[:inputs])
-      entry[:exactly_empty_components].each do |component|
-        assert_equal(result[component][:groups], {}) if result
-      end
+  def assert_expected_match(pattern, entry)
+    if entry[:expected_match] == "error"
+      assert_expected_match_error pattern, entry
+    elsif entry[:expected_match].is_a?(Hash)
+      assert_expected_match_hash pattern, entry
+    else
+      assert_expected_match_nil pattern, entry
+    end
+  end
+
+  def assert_expected_match_error(pattern, entry)
+    assert_raises(StandardError) { pattern.test?(*entry[:inputs]) }
+
+    assert_raises(StandardError) { pattern.exec(*entry[:inputs]) }
+
+    true
+  end
+
+  def assert_expected_match_hash(pattern, entry)
+    assert pattern.test?(*entry[:inputs])
+
+    result = pattern.exec(*entry[:inputs])
+    refute_nil result
+    entry[:expected_match].each do |key, expected|
+      assert_equal result[key], expected
+    end
+  end
+
+  def assert_expected_match_nil(pattern, entry)
+    refute pattern.test?(*entry[:inputs])
+
+    assert_nil pattern.exec(*entry[:inputs])
+  end
+
+  def assert_exactly_empty_components(pattern, entry)
+    return unless entry.key?(:exactly_empty_components)
+
+    result = pattern.exec(*entry[:inputs])
+    entry[:exactly_empty_components].each do |component|
+      assert_equal(result[component][:groups], {}) if result
     end
   end
 end
