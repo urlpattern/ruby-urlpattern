@@ -1,8 +1,12 @@
-# Urlpattern
+# urlpattern
 
-TODO: Delete this and the text below, and describe your gem
+An implementation of [the URL Pattern Standard](https://urlpattern.spec.whatwg.org/) for Ruby written in Rust.
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/urlpattern`. To experiment with that code, run `bin/console` for an interactive prompt.
+## Description
+
+It's a thin wrapper of [denoland/rust-urlpattern](https://github.com/denoland/rust-urlpattern) with [Magnus](https://github.com/matsadler/magnus).
+
+It is useful on the server side when serving different pages based on the URL (a.k.a. routing). It provides pattern matching syntax like `/users/:id`, similar to [route parameters in Express](https://expressjs.com/en/guide/routing.html#route-parameters) or [Path-to-RegExp](https://github.com/pillarjs/path-to-regexp). You can use it as a foundation to build your own web server or framework.
 
 ## Installation
 
@@ -32,7 +36,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/urlpattern. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/urlpattern/blob/main/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/urlpattern/ruby-urlpattern. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/urlpattern/ruby-urlpattern/blob/main/CODE_OF_CONDUCT.md).
 
 ## License
 
@@ -40,4 +44,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Urlpattern project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/urlpattern/blob/main/CODE_OF_CONDUCT.md).
+Everyone interacting in the Urlpattern project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/urlpattern/ruby-urlpattern/blob/main/CODE_OF_CONDUCT.md).
