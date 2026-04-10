@@ -77,6 +77,12 @@ pattern.test? "https://example.com/test" #=> true
 pattern.test? "https://example.com/TeST" #=> true
 ```
 
+## Limitations
+
+Due to limitations in the dependency [denoland/rust-urlpattern](https://github.com/denoland/rust-urlpattern), it may not support all features specified in [the standard](https://urlpattern.spec.whatwg.org/).
+
+Check `skip` in [`test/test_urlpattern.rb`](https://github.com/urlpattern/ruby-urlpattern/blob/main/test/test_urlpattern.rb).
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
