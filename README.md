@@ -24,7 +24,54 @@ gem install urlpattern
 
 ## Usage
 
-TODO: Write usage instructions here
+This library aims to expose an interface as close as possible to the URL Pattern Standard, but some differences are unavoidable because it is designed for Ruby, not JavaScript. For the exact details, please refer to [urlpattern.rbs](https://github.com/urlpattern/ruby-urlpattern/blob/main/sig/urlpattern.rbs).
+
+Most JavaScript examples from [Chrome for Developers](https://developer.chrome.com/docs/web-platform/urlpattern) and [MDN](https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API) can be adapted to Ruby without much difficulty.
+
+### `test`
+
+```rb
+require "urlpattern"
+
+pattern = URLPattern::URLPattern.new "https://example.com/admin/*"
+pattern.test? "https://example.com/admin/main/" #=> true
+pattern.test? "https://example.com/main/"       #=> false
+```
+
+### `exec`
+
+```rb
+require "urlpattern"
+
+pattern = URLPattern::URLPattern.new pathname: "/users/:id/"
+result = pattern.exec pathname: "/users/4163/"
+result[:pathname][:groups][:id] #=> 4163
+```
+
+### `base_url`
+
+```rb
+require "urlpattern"
+
+pattern = URLPattern::URLPattern.new "b", "https://example.com/a/"
+pattern.test? "a/b", "https://example.com/"                     #=> true
+pattern.test? "b", "https://example.com/a/"                     #=> true
+pattern.test? pathname: "b", base_url: "https://example.com/a/" #=> true
+```
+
+### `ignore_case`
+
+```rb
+require "urlpattern"
+
+pattern = URLPattern::URLPattern.new "https://example.com/test"
+pattern.test? "https://example.com/test" #=> true
+pattern.test? "https://example.com/TeST" #=> false
+
+pattern = URLPattern::URLPattern.new "https://example.com/test", ignore_case: true
+pattern.test? "https://example.com/test" #=> true
+pattern.test? "https://example.com/TeST" #=> true
+```
 
 ## Development
 
