@@ -1,5 +1,9 @@
 # urlpattern
 
+[![Ruby Style Guide](https://img.shields.io/badge/code_style-rubocop-brightgreen.svg)](https://github.com/rubocop/rubocop)
+[![Gem Version](https://badge.fury.io/rb/urlpattern.svg)](https://badge.fury.io/rb/urlpattern)
+[![Ruby](https://github.com/urlpattern/ruby-urlpattern/actions/workflows/main.yml/badge.svg)](https://github.com/urlpattern/ruby-urlpattern/actions/workflows/main.yml)
+
 An implementation of [the URL Pattern Standard](https://urlpattern.spec.whatwg.org/) for Ruby written in Rust.
 
 ## Description
