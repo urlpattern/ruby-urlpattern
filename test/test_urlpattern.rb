@@ -18,7 +18,8 @@ class TestURLPattern < Minitest::Test
   URLPATTERNTESTDATA = begin
     UNDERSCORE = { baseURL: :base_url, ignoreCase: :ignore_case }.freeze
 
-    # Use `Oj.strict_load` with `allow_invalid_unicode` to work around `JSON::ParserError` (incomplete surrogate pair).
+    # `JSON.parse` raises `JSON::ParserError` (incomplete surrogate pair) for some test data.
+    # To work around this, use `Oj.strict_load` with `allow_invalid_unicode`.
     Oj.strict_load(File.read(
                      File.join(__dir__, "fixtures", "urlpatterntestdata.json"), encoding: Encoding::UTF_8
                    ), { allow_invalid_unicode: true, symbol_keys: true }).map do |entry|
