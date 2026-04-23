@@ -19,4 +19,9 @@ RbSys::ExtensionTask.new("urlpattern", GEMSPEC) do |ext|
   ext.lib_dir = "lib/urlpattern"
 end
 
+Rake::Task["release:rubygem_push"].clear
+task "release:rubygem_push" do
+  Dir["pkg/*.gem"].each { |gem| sh "gem", "push", gem }
+end
+
 task default: %i[compile test rubocop]

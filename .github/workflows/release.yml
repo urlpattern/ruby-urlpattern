@@ -47,7 +47,25 @@ jobs:
   release:
     needs: cross-compile
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      id-token: write
+
+    # If you configured a GitHub environment on RubyGems, you must use it here.
+    environment: release
+
     steps:
+      # Set up
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          ruby-version: ruby
+
       - uses: actions/download-artifact@v7
         with:
           path: artifacts
@@ -55,15 +73,6 @@ jobs:
         run: |
           mkdir -p pkg
           find artifacts -name "*.gem" -exec mv {} pkg/ \;
-      - name: Publish to RubyGems
-        env:
-          RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
-        run: |
-          mkdir -p ~/.gem
-          echo "---
-          :rubygems_api_key: ${RUBYGEMS_API_KEY}" > ~/.gem/credentials
-          chmod 0600 ~/.gem/credentials
-          for gem in pkg/*.gem
-          do
-            gem push $gem
-          done
+
+      # Release
+      - uses: rubygems/release-gem@v1
