@@ -6,7 +6,7 @@
 	"image": "mcr.microsoft.com/devcontainers/ruby:3-4-trixie",
 	"features": {
 		"ghcr.io/devcontainers/features/rust:1": {}
-	}
+	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
@@ -15,7 +15,9 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "ruby --version",
+	// See: https://containers.dev/implementors/json_reference/#lifecycle-scripts
+	// See: https://oxidize-rb.org/docs/faq/#q-the-build-is-failing-with-a-libclang-not-found-error
+	"postCreateCommand": "sudo apt update && sudo apt install -y libclang-dev"
 
 	// Configure tool-specific properties.
 	// "customizations": {},
