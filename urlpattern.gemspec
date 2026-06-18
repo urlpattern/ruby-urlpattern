@@ -14,11 +14,11 @@ Gem::Specification.new do |spec|
 
     It is useful on the server side when serving different pages based on the URL (a.k.a. routing). It provides pattern matching syntax like /users/:id, similar to route parameters in Express or Path-to-RegExp. You can use it as a foundation to build your own web server or framework.
   DESCRIPTION
-  spec.homepage = "https://github.com/urlpattern/ruby-urlpattern"
+  spec.homepage = "https://github.com/bangseongbeom/ruby-urlpattern"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.2.0"
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://github.com/urlpattern/ruby-urlpattern"
+  spec.metadata["source_code_uri"] = "https://github.com/bangseongbeom/ruby-urlpattern"
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.

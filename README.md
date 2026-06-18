@@ -2,7 +2,7 @@
 
 [![Ruby Style Guide](https://img.shields.io/badge/code_style-rubocop-brightgreen.svg)](https://github.com/rubocop/rubocop)
 [![Gem Version](https://badge.fury.io/rb/urlpattern.svg)](https://badge.fury.io/rb/urlpattern)
-[![Ruby](https://github.com/urlpattern/ruby-urlpattern/actions/workflows/main.yml/badge.svg)](https://github.com/urlpattern/ruby-urlpattern/actions/workflows/main.yml)
+[![Ruby](https://github.com/bangseongbeom/ruby-urlpattern/actions/workflows/main.yml/badge.svg)](https://github.com/bangseongbeom/ruby-urlpattern/actions/workflows/main.yml)
 
 An implementation of [the URL Pattern Standard](https://urlpattern.spec.whatwg.org/) for Ruby written in Rust.
 
@@ -28,7 +28,7 @@ gem install urlpattern
 
 ## Usage
 
-This library aims to expose an interface as close as possible to the URL Pattern Standard, but some differences are unavoidable because it is designed for Ruby, not JavaScript. For the exact details, please refer to [urlpattern.rbs](https://github.com/urlpattern/ruby-urlpattern/blob/main/sig/urlpattern.rbs).
+This library aims to expose an interface as close as possible to the URL Pattern Standard, but some differences are unavoidable because it is designed for Ruby, not JavaScript. For the exact details, please refer to [urlpattern.rbs](https://github.com/bangseongbeom/ruby-urlpattern/blob/main/sig/urlpattern.rbs).
 
 Most JavaScript examples from [Chrome for Developers](https://developer.chrome.com/docs/web-platform/urlpattern) and [MDN](https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API) can be adapted to Ruby without much difficulty.
 
@@ -81,7 +81,7 @@ pattern.test? "https://example.com/TeST" #=> true
 
 Due to limitations in the dependency [denoland/rust-urlpattern](https://github.com/denoland/rust-urlpattern), it may not support all features specified in [the standard](https://urlpattern.spec.whatwg.org/).
 
-Check `skip` in [`test/test_urlpattern.rb`](https://github.com/urlpattern/ruby-urlpattern/blob/main/test/test_urlpattern.rb).
+Check `skip` in [`test/test_urlpattern.rb`](https://github.com/bangseongbeom/ruby-urlpattern/blob/main/test/test_urlpattern.rb).
 
 ## Development
 
@@ -91,7 +91,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/urlpattern/ruby-urlpattern. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/urlpattern/ruby-urlpattern/blob/main/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/bangseongbeom/ruby-urlpattern. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/bangseongbeom/ruby-urlpattern/blob/main/CODE_OF_CONDUCT.md).
 
 ## License
 
@@ -99,4 +99,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Urlpattern project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/urlpattern/ruby-urlpattern/blob/main/CODE_OF_CONDUCT.md).
+Everyone interacting in the Urlpattern project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/bangseongbeom/ruby-urlpattern/blob/main/CODE_OF_CONDUCT.md).
